@@ -1,0 +1,25 @@
+{
+  "description": "v1tsdp's portfolio and projects",
+  "domain": "v1tsdp.is-a.dev",
+  "subdomain": "v1tsdp",
+  "owner": {
+    "username": "v1tsdp",
+    "email": "your-email@example.com"
+  },
+  "record": {
+    "type": "CNAME",
+    "value": "v1tsdp.github.io"
+  },
+  "documentation": {
+    "info": "Этот файл используется для регистрации сабдомена v1tsdp.is-a.dev",
+    "steps": [
+      "1. Форкни репозиторий is-a-dev/register: https://github.com/is-a-dev/register",
+      "2. Создай файл в domains/ директории с именем v1tsdp.json",
+      "3. Скопируй содержимое этого файла",
+      "4. Обновь email на твой настоящий email",
+      "5. Создай Pull Request",
+      "6. Дождись одобрения от модераторов"
+    ],
+    "result": "После одобрения PR твой домен v1tsdp.is-a.dev будет указывать на v1tsdp.github.io"
+  }
+}
