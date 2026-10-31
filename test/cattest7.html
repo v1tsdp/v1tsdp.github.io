@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cat</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg role='img' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path d='M3.309 5.116a.87.87 0 0 1 .958.24L7.369 8.89h9.262l3.102-3.536a.867.867 0 0 1 1.52.573v7.807H24v1.735h-4.482V8.232l-1.842 2.099a.87.87 0 0 1-.652.295H6.976a.87.87 0 0 1-.652-.295l-1.842-2.1v7.239H0v-1.735h2.747V5.928c0-.362.224-.685.562-.812m16.209 12.089H24v1.735h-4.482zM0 17.205h4.482v1.735H0zm9.253-2.892a1.157 1.157 0 1 1-2.314 0 1.157 1.157 0 0 1 2.314 0m7.807 0a1.157 1.157 0 1 1-2.313 0 1.157 1.157 0 0 1 2.313 0' fill='%23ffffff'/></svg>">
+    <style>
+        html, body {
+            background-color: #6d90b2;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            background-color: #6d90b2;
+            background: url('background.webp') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100dvh;
+        }
+        #loader {
+            color: #8daac7;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 15px;
+            letter-spacing: 0.05em;
+        }
+        #cat {
+            display: none;
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        #pill-menu {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            height: 54px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            padding: 0 6px;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(7px);
+            -webkit-backdrop-filter: blur(15px);
+            border: none;
+            border-radius: 27px;
+            box-shadow: none;
+            z-index: 2147483647;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .pill-btn {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .pill-btn svg {
+            width: 30px;
+            height: 30px;
+            display: block;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+        }
+
+        .pill-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .pill-btn:active:not(:disabled) {
+            transform: scale(0.92);
+        }
+
+        .pill-btn:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">Loading...</div>
+    <img id="cat" alt="Cat">
+
+    <div id="pill-menu">
+        <button id="prevBtn" class="pill-btn" title="Назад" disabled>
+            <svg viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="11 18 5 12 11 6"></polyline>
+            </svg>
+        </button>
+        <button id="nextBtn" class="pill-btn" title="Вперед">
+            <svg viewBox="0 0 24 24">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="13 6 19 12 13 18"></polyline>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        const img = document.getElementById('cat');
+        const loader = document.getElementById('loader');
+        const pill = document.getElementById('pill-menu');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        const history = [];
+        let currentIndex = -1;
+
+        function updateUI() {
+            prevBtn.disabled = currentIndex <= 0;
+        }
+
+        function showImage(url) {
+            loader.style.display = 'block';
+            loader.textContent = 'Loading...';
+            img.style.display = 'none';
+
+            img.onload = () => {
+                loader.style.display = 'none';
+                img.style.display = 'block';
+                updateUI();
+            };
+
+            img.onerror = () => {
+                loader.textContent = 'Error loading image';
+                updateUI();
+            };
+
+            img.src = url;
+        }
+
+        async function fetchNextCat() {
+            if (currentIndex < history.length - 1) {
+                currentIndex++;
+                showImage(history[currentIndex]);
+                return;
+            }
+
+            nextBtn.disabled = true;
+            try {
+                const response = await fetch('https://api.thecatapi.com/v1/images/search');
+                const data = await response.json();
+                const newUrl = data[0].url;
+
+                history.push(newUrl);
+                currentIndex++;
+                showImage(newUrl);
+            } catch (error) {
+                console.error(error);
+                loader.textContent = 'Error loading image';
+            } finally {
+                nextBtn.disabled = false;
+            }
+        }
+
+        function showPrevCat() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showImage(history[currentIndex]);
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (!isDragging) fetchNextCat();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (!isDragging) showPrevCat();
+        });
+
+        let isDragging = false;
+        let dragStartX, dragStartY;
+
+        function handleDragStart(e) {
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            const rect = pill.getBoundingClientRect();
+            
+            let shiftX = clientX - rect.left;
+            let shiftY = clientY - rect.top;
+            isDragging = false;
+            dragStartX = clientX;
+            dragStartY = clientY;
+
+            function handleDragMove(e) {
+                const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                const currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                
+                if (Math.abs(currentX - dragStartX) > 5 || Math.abs(currentY - dragStartY) > 5) {
+                    isDragging = true;
+                }
+
+                if (isDragging) {
+                    if (e.cancelable) e.preventDefault();
+                    pill.style.right = 'auto';
+                    pill.style.bottom = 'auto';
+                    
+                    let newLeft = currentX - shiftX;
+                    let newTop = currentY - shiftY;
+
+                    const maxTop = window.innerHeight - pill.offsetHeight;
+                    const maxLeft = window.innerWidth - pill.offsetWidth;
+
+                    if (newTop > maxTop) newTop = maxTop;
+                    if (newTop < 0) newTop = 0;
+                    if (newLeft > maxLeft) newLeft = maxLeft;
+                    if (newLeft < 0) newLeft = 0;
+
+                    pill.style.left = newLeft + 'px';
+                    pill.style.top = newTop + 'px';
+                }
+            }
+
+            function handleDragEnd() {
+                document.removeEventListener('mousemove', handleDragMove);
+                document.removeEventListener('touchmove', handleDragMove);
+                document.removeEventListener('mouseup', handleDragEnd);
+                document.removeEventListener('touchend', handleDragEnd);
+                setTimeout(() => { isDragging = false; }, 50);
+            }
+
+            document.addEventListener('mousemove', handleDragMove, {passive: false});
+            document.addEventListener('touchmove', handleDragMove, {passive: false});
+            document.addEventListener('mouseup', handleDragEnd);
+            document.addEventListener('touchend', handleDragEnd);
+        }
+
+        pill.addEventListener('mousedown', handleDragStart);
+        pill.addEventListener('touchstart', handleDragStart, {passive: false});
+        pill.ondragstart = () => false;
+
+        fetchNextCat();
+    </script>
+</body>
+</html>
