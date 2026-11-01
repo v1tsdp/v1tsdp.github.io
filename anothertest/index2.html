@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#6d90b2">
+  <meta name="color-scheme" content="dark">
+  <meta name="darkreader-lock">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <title>v1tsdp</title>
+
+  <meta name="description" content="v1tsdp — personal links and contacts">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' ry='20' fill='%232f3237'/><text y='70' x='50' text-anchor='middle' font-family='Times New Roman, serif' font-size='75' font-weight='bold' fill='%23ffffff'>v</text></svg>">
+
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    ::selection {
+      background: transparent;
+    }
+
+    ::-moz-selection {
+      background: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #6d90b2;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #6d90b2;
+      background-image: url("../background.webp");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100dvh;
+    }
+
+    .card {
+      width: max-content;
+      max-width: 95vw;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 50px;
+      border-radius: 20px;
+      text-align: center;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .username {
+      position: relative;
+      display: inline-block;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 3em;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .username:active {
+      transform: scale(0.97);
+      filter: brightness(0.9);
+    }
+
+    .copy-toast {
+      position: absolute;
+      bottom: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      font-weight: normal;
+      color: #ffffff;
+      background: rgba(18, 22, 30, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      padding: 3px 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      text-shadow: none;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .copy-toast.show {
+      opacity: 0.85;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: nowrap;
+    }
+
+    .social-links > a,
+    .dropdown-trigger {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 50px;
+      height: 50px;
+      flex-shrink: 0;
+      color: #ffffff;
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition:
+        transform 0.2s ease,
+        color 0.2s ease,
+        filter 0.2s ease;
+    }
+
+    .social-links > a:hover,
+    .dropdown-trigger:hover,
+    .dropdown.active .dropdown-trigger {
+      transform: scale(1.15);
+      color: #dddddd;
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.35));
+    }
+
+    .social-links svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    .icon-mask {
+      width: 100%;
+      height: 100%;
+      display: inline-block;
+      background-color: currentColor;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+    }
+
+    .dropdown {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: max-content;
+      min-width: 180px;
+      padding: 8px;
+      background: rgba(18, 22, 30, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+    }
+
+    .dropdown.active .dropdown-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      height: auto;
+      min-height: auto;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-size: 0.9em;
+      text-decoration: none;
+      white-space: nowrap;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+      filter: none;
+    }
+
+    .dropdown-item:active {
+      transform: translateY(0);
+    }
+
+    .dropdown-link {
+      text-decoration: none;
+    }
+
+    .dropdown-link::before {
+      content: "";
+      width: 5px;
+      height: 13px;
+      display: block;
+    }
+
+    .dropdown-link span {
+      text-decoration: none;
+    }
+
+    .dropdown-link svg {
+      width: 13px;
+      height: 13px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      display: block;
+    }
+
+    .mono-nick {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.95em;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 30px;
+      }
+
+      .username {
+        font-size: 2em;
+      }
+
+      .social-links > a,
+      .dropdown-trigger {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="username" id="mainUsername">
+      v1tsdp
+      <span class="copy-toast" id="usernameToast">copied</span>
+    </div>
+
+    <div class="social-links" id="socialLinks"></div>
+  </div>
+
+  <script>
+    const mainUsername = document.getElementById('mainUsername');
+    const usernameToast = document.getElementById('usernameToast');
+    const mainNick = 'v1tsdp';
+
+    async function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+    }
+
+    mainUsername.addEventListener('click', async () => {
+      try {
+        await copyText(mainNick);
+        usernameToast.classList.add('show');
+        setTimeout(() => usernameToast.classList.remove('show'), 1200);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.dropdown.active').forEach((dropdown) => {
+        if (!dropdown.contains(e.target)) {
+          dropdown.classList.remove('active');
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.dropdown.active').forEach((d) => d.classList.remove('active'));
+      }
+    });
+
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    function createIconHtml(item) {
+      if (item.icon) {
+        const url = `https://cdn.simpleicons.org/${item.icon}`;
+        return `<span class="icon-mask" style="-webkit-mask-image: url('${url}'); mask-image: url('${url}');"></span>`;
+      }
+      if (item.path) {
+        return `<svg viewBox="0 0 24 24"><path d="${item.path}"/></svg>`;
+      }
+      if (item.svg) {
+        return `<svg viewBox="0 0 24 24">${item.svg}</svg>`;
+      }
+      return '';
+    }
+
+    async function renderLinks() {
+      const container = document.getElementById('socialLinks');
+      try {
+        const res = await fetch(`links.json?_=${Date.now()}`);
+        if (!res.ok) throw new Error('Failed to load links');
+        const items = await res.json();
+
+        items.forEach((item) => {
+          if (!item.enabled) return;
+
+          if (item.type === 'link') {
+            const a = document.createElement('a');
+            a.href = item.url;
+            a.title = item.title;
+            a.setAttribute('aria-label', item.title);
+            a.innerHTML = createIconHtml(item);
+            container.appendChild(a);
+
+          } else if (item.type === 'dropdown') {
+            const dropdown = document.createElement('div');
+            dropdown.className = 'dropdown';
+
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'dropdown-trigger';
+            trigger.title = item.title;
+            trigger.setAttribute('aria-label', `${item.title} menu`);
+            trigger.innerHTML = createIconHtml(item);
+
+            trigger.addEventListener('click', (e) => {
+              e.stopPropagation();
+              document.querySelectorAll('.dropdown.active').forEach((d) => {
+                if (d !== dropdown) d.classList.remove('active');
+              });
+              dropdown.classList.toggle('active');
+            });
+
+            const menu = document.createElement('div');
+            menu.className = 'dropdown-menu';
+
+            (item.menu || []).forEach((mItem) => {
+              if (mItem.action === 'copy') {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'dropdown-item';
+                btn.innerHTML = `<span class="btn-text"><span class="mono-nick">${mItem.label}</span></span>`;
+
+                btn.addEventListener('click', async (e) => {
+                  e.stopPropagation();
+                  await copyText(mItem.copyValue);
+                  const textSpan = btn.querySelector('.btn-text');
+                  const origHtml = textSpan.innerHTML;
+                  textSpan.textContent = 'copied';
+                  setTimeout(() => {
+                    textSpan.innerHTML = origHtml;
+                  }, 1200);
+                });
+
+                menu.appendChild(btn);
+              } else if (mItem.action === 'link') {
+                const link = document.createElement('a');
+                link.href = mItem.url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'dropdown-item dropdown-link';
+                link.innerHTML = `
+                  <span>${mItem.label}</span>
+                  <svg viewBox="0 0 24 24">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                `;
+                menu.appendChild(link);
+              }
+            });
+
+            dropdown.appendChild(trigger);
+            dropdown.appendChild(menu);
+            container.appendChild(dropdown);
+          }
+        });
+      } catch (err) {
+        console.error('Ошибка загрузки кнопок:', err);
+      }
+    }
+
+    renderLinks();
+  </script>
+</body>
+</html>
